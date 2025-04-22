@@ -9,7 +9,7 @@ namespace FactorioRateCalculator
         public Form1()
         {
             InitializeComponent();
-            this.recipes = ReadRecipesFile();
+            recipes = ReadRecipesFile();
         }
 
         static IReadOnlyList<Recipe> ReadRecipesFile()
