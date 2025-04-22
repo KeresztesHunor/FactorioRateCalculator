@@ -1,13 +1,36 @@
-﻿namespace FactorioRateCalculator
+﻿using System.Numerics;
+
+namespace FactorioRateCalculator
 {
     internal static class Utils
     {
-        public static void ForEach<TEnumerable, T>(this TEnumerable values, Action<T> action) where TEnumerable : IEnumerable<T>
+        public static T GreatestCommonDenominator<T>(T a, T b) where T : struct, IBinaryInteger<T>
         {
-            foreach (T item in values)
+            while (b != T.Zero)
             {
-                action(item);
+                T tmp = b;
+                b = a % b;
+                a = tmp;
             }
+            return T.Abs(a);
+        }
+
+        public static T SmallestCommonMultiple<T>(T a, T b) where T : struct, IBinaryInteger<T> => a != T.Zero && b != T.Zero ? T.Abs(a * b) / GreatestCommonDenominator(a, b) : T.Zero;
+
+        public static Rational<T> RecalculateWithNewDenominator<T>(this Rational<T> value, T newDenominator, bool simplifyFirst = true) where T : struct, IBinaryInteger<T>, ISignedNumber<T>
+        {
+            if (simplifyFirst)
+            {
+                value = value.Simplified;
+            }
+            if (newDenominator <= T.Zero || newDenominator % value.Denominator != T.Zero)
+            {
+                throw new ArithmeticException($"Cannot recalculate {value.ToString()} to the following new denominator: {newDenominator}");
+            }
+            return new Rational<T>(
+                value.Enumerator * (value.Denominator == newDenominator ? newDenominator : newDenominator / value.Denominator),
+                !value.isNegative ? newDenominator : -newDenominator
+            );
         }
 
         public static string PascalToKebabCase(this string s) => s.ToCase(char.ToLower, char.IsUpper, static (char c) => "-" + c);
