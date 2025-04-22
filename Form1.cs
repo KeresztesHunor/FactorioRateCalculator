@@ -15,8 +15,7 @@ namespace FactorioRateCalculator
         static IReadOnlyList<Recipe> ReadRecipesFile()
         {
             using FileStream fs = new FileStream("../../../recipe.json", FileMode.Open, FileAccess.Read);
-            return JsonSerializer.Deserialize<List<Recipe>>(fs, new JsonSerializerOptions
-            {
+            return JsonSerializer.Deserialize<List<Recipe>>(fs, new JsonSerializerOptions {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
                 PropertyNameCaseInsensitive = true,
                 Converters = {
