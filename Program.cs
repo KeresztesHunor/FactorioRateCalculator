@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace FactorioRateCalculator
 {
     internal static class Program
