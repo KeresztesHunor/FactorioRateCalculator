@@ -4,6 +4,16 @@ namespace FactorioRateCalculator
 {
     internal static class Utils
     {
+        public static Rational<T> Sum<T>(this IEnumerable<Rational<T>> rationals) where T : struct, IBinaryInteger<T>, ISignedNumber<T>
+        {
+            Rational<T> result = Rational<T>.Zero;
+            foreach (Rational<T> rational in rationals)
+            {
+                result += rational;
+            }
+            return result;
+        }
+
         public static T GreatestCommonDenominator<T>(T a, T b) where T : struct, IBinaryInteger<T>
         {
             while (b != T.Zero)

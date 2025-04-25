@@ -26,12 +26,12 @@ namespace FactorioRateCalculator
         public static List<Result> FlatteringProduct(List<Result> products)
         {
             List<Result> list = [];
-            foreach (var item in products)
+            foreach (Result item in products)
             {
-                if (list.Select(x => x.Product.Name).Any(x => x == item.Product.Name))
+                int index = list.FindIndex((Result result) => result.Product.Name == item.Product.Name);
+                if (index != -1)
                 {
-                    int index = list.FindIndex(x => x.Product.Name == item.Product.Name);
-                    var tmp = list.First(x => x.Product.Name == item.Product.Name);
+                    Result tmp = list[index];
                     tmp.Ratio += item.Ratio;
                     list[index] = tmp;
                 }
@@ -46,11 +46,11 @@ namespace FactorioRateCalculator
         public static CraftingTreeNode GenerateCraftingTree(IReadOnlyList<Recipe> recipes, Recipe recipe)
         {
             List<CraftingTreeNode> rec = [];
-            foreach (var ingredient in recipe.Ingredients)
+            foreach (Product ingredient in recipe.Ingredients)
             {
-                Recipe? recipe1 = recipes.FirstOrDefault(x => x.Name == ingredient.Name);
+                Recipe recipe1 = recipes.FirstOrDefault(x => x.Name == ingredient.Name);
                 if (!Equals(recipe1, default(Recipe)))
-                    rec.Add(GenerateCraftingTree(recipes, (Recipe)recipe1));
+                    rec.Add(GenerateCraftingTree(recipes, recipe1));
             }
             return new CraftingTreeNode(recipe, rec);
         }
@@ -63,15 +63,15 @@ namespace FactorioRateCalculator
         }
         public List<Result> RequestedProducts(List<string> hasItems, Rational<int> count)
         {
-            List<Product> availableIngredients = RootRecipe
+            IEnumerable<Product> availableIngredients = RootRecipe
                 .Ingredients
                 .Where(x => hasItems.Contains(x.Name))
-                .ToList();
-            List<CraftingTreeNode?> missingIngredientNodes = RootRecipe
+            ;
+            IEnumerable<CraftingTreeNode?> missingIngredientNodes = RootRecipe
                 .Ingredients
                 .Where(x => !hasItems.Contains(x.Name))
                 .Select(x => NodeRecipes.FirstOrDefault(y => y.RootRecipe.Name == x.Name))
-                .ToList();
+            ;
 
             return [
                 ..availableIngredients.Select(x => new Result(x, RootRecipe, count * x.Amount)),

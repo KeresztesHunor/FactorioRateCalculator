@@ -17,8 +17,7 @@ namespace FactorioRateCalculator
         static IReadOnlyList<Recipe> ReadRecipesFile()
         {
             using FileStream fs = new FileStream("recipe.json", FileMode.Open, FileAccess.Read);
-            return JsonSerializer.Deserialize<List<Recipe>>(fs, new JsonSerializerOptions
-            {
+            return JsonSerializer.Deserialize<List<Recipe>>(fs, new JsonSerializerOptions {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
                 PropertyNameCaseInsensitive = true,
                 Converters = {
@@ -43,22 +42,23 @@ namespace FactorioRateCalculator
         private void CalcButton_Click(object sender, EventArgs e)
         {
             CraftingTreeNode rec = CraftingTreeNode.GenerateCraftingTree(recipes, (Recipe)recipesListBox.SelectedItem!);
-            List<CraftingTreeNode.Result> result = [.. CraftingTreeNode.FlatteringProduct(
-                rec
-               .RequestedProducts(
+            List<CraftingTreeNode.Result> result = CraftingTreeNode.FlatteringProduct(rec
+                .RequestedProducts(
                     checkedListBox1.CheckedItems
                         .OfType<string>()
                         .ToList(),
-                    new Rational<int>((int)numericUpDown1.Value, 1)
-                ))];
-            resultListBox.DataSource = result.Select(x => $"{x.Product.Name} {x.Ratio.ValueD}x ({x.Ratio / result.Sum(y => y.Ratio.ValueD):P2})").ToList();
+                    (int)numericUpDown1.Value
+                )
+            );
+            resultListBox.DataSource = result.Select(x => $"{x.Product.Name} {x.Ratio.ValueD}x ({(x.Ratio / result.Select(x => x.Ratio).Sum()).ValueD:P2})").ToList();
         }
 
         private void TextBox1_TextChanged(object sender, EventArgs e)
         {
             recipesListBox.DataSource = recipes
                 .Where(x => x.Name.Contains(textBox1.Text, StringComparison.CurrentCultureIgnoreCase))
-                .ToList();
+                .ToList()
+            ;
         }
 
         private void RecipesListBox_SelectedIndexChanged(object sender, EventArgs e)
