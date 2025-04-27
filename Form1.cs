@@ -7,10 +7,13 @@ namespace FactorioRateCalculator
     {
         IReadOnlyList<Recipe> recipes { get; }
 
+        LastCalculatedRatio? lastCalculatedRatio;
+
         public Form1()
         {
             InitializeComponent();
             recipes = ReadRecipesFile();
+            lastCalculatedRatio = null;
             recipesListBox.DataSource = recipes;
         }
 
@@ -27,11 +30,18 @@ namespace FactorioRateCalculator
             })!;
         }
 
-        private void BeolvasToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LementToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            textBox1.Text = string.Empty;
-            ReadRecipesFile();
-            recipesListBox.DataSource = recipes;
+            if (lastCalculatedRatio is not null)
+            {
+                LastCalculatedRatio lastCalculatedRatio = this.lastCalculatedRatio.Value;
+                using FileStream fs = new FileStream($"../../../Results/{lastCalculatedRatio.RecipeName}.txt", FileMode.Create, FileAccess.Write);
+                using StreamWriter sw = new StreamWriter(fs);
+                sw.WriteLine("ingredient ratio data:");
+                sw.WriteLine(string.Join('\n', lastCalculatedRatio.IngredientRatioData));
+                sw.WriteLine("main bus has:");
+                sw.WriteLine(string.Join('\n', lastCalculatedRatio.MainBusItems));
+            }
         }
 
         private void RecipesListBox_Format(object sender, ListControlConvertEventArgs e)
@@ -41,7 +51,8 @@ namespace FactorioRateCalculator
 
         private void CalcButton_Click(object sender, EventArgs e)
         {
-            CraftingTreeNode rec = CraftingTreeNode.GenerateCraftingTree(recipes, (Recipe)recipesListBox.SelectedItem!);
+            Recipe selectedRecipe = (Recipe)recipesListBox.SelectedItem!;
+            CraftingTreeNode rec = CraftingTreeNode.GenerateCraftingTree(recipes, selectedRecipe);
             List<CraftingTreeNode.Result> result = CraftingTreeNode.FlatteringProduct(rec
                 .RequestedProducts(
                     checkedListBox1.CheckedItems
@@ -50,7 +61,9 @@ namespace FactorioRateCalculator
                     (int)numericUpDown1.Value
                 )
             );
-            resultListBox.DataSource = result.Select(x => $"{x.Product.Name} {x.Ratio.ValueD}x ({(x.Ratio / result.Select(x => x.Ratio).Sum()).ValueD:P2})").ToList();
+            IEnumerable<string> ingredientRatioData = result.Select(x => $"{x.Product.Name} {x.Ratio.ValueD}x ({(x.Ratio / result.Select(x => x.Ratio).Sum()).ValueD:P2})");
+            resultListBox.DataSource = ingredientRatioData.ToArray();
+            lastCalculatedRatio = new LastCalculatedRatio(selectedRecipe.Name, ingredientRatioData, checkedListBox1.CheckedItems.OfType<string>());
         }
 
         private void TextBox1_TextChanged(object sender, EventArgs e)
@@ -65,6 +78,15 @@ namespace FactorioRateCalculator
         {
             checkedListBox1.Items.Clear();
             checkedListBox1.Items.AddRange(CraftingTreeNode.GenerateCraftingTree(recipes, (Recipe)recipesListBox.SelectedItem!).GetUniqueProducts().ToArray());
+        }
+
+        readonly struct LastCalculatedRatio(string recipeName, IEnumerable<string> ingredientRatioData, IEnumerable<string> mainBusItems)
+        {
+            public string RecipeName { get; } = recipeName;
+
+            public IEnumerable<string> IngredientRatioData { get; } = ingredientRatioData;
+
+            public IEnumerable<string> MainBusItems { get; } = mainBusItems;
         }
     }
 }

@@ -32,7 +32,7 @@
             recipesListBox = new ListBox();
             contextMenuStrip1 = new ContextMenuStrip(components);
             menuStrip1 = new MenuStrip();
-            beolvasToolStripMenuItem = new ToolStripMenuItem();
+            lementToolStripMenuItem = new ToolStripMenuItem();
             CalcButton = new Button();
             textBox1 = new TextBox();
             label1 = new Label();
@@ -63,19 +63,19 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { beolvasToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { lementToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1493, 24);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
-            // beolvasToolStripMenuItem
+            // lementToolStripMenuItem
             // 
-            beolvasToolStripMenuItem.Name = "beolvasToolStripMenuItem";
-            beolvasToolStripMenuItem.Size = new Size(59, 20);
-            beolvasToolStripMenuItem.Text = "beolvas";
-            beolvasToolStripMenuItem.Click += BeolvasToolStripMenuItem_Click;
+            lementToolStripMenuItem.Name = "lementToolStripMenuItem";
+            lementToolStripMenuItem.Size = new Size(59, 20);
+            lementToolStripMenuItem.Text = "Lement";
+            lementToolStripMenuItem.Click += LementToolStripMenuItem_Click;
             // 
             // CalcButton
             // 
@@ -178,7 +178,7 @@
         private ListBox recipesListBox;
         private ContextMenuStrip contextMenuStrip1;
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem beolvasToolStripMenuItem;
+        private ToolStripMenuItem lementToolStripMenuItem;
         private Button CalcButton;
         private Label resultLabel1;
         private TextBox textBox1;

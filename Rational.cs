@@ -360,7 +360,7 @@ namespace FactorioRateCalculator
         }
 
         public static implicit operator Rational<T>(T value) => new Rational<T>(value, T.One);
-
+    
         public static implicit operator T(Rational<T> value) => value.ValueI;
 
         public static implicit operator Half(Rational<T> value) => value.ValueH;
